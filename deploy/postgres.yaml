@@ -3,7 +3,7 @@ kind: PersistentVolumeClaim
 metadata:
   name: django-postgres-pvc
   labels:
-    apps: django
+    app: django
 spec:
   accessModes:
     - ReadWriteOnce
@@ -33,21 +33,20 @@ spec:
       labels:
         app: django
         tier: postgres
-  volumes:
-    - name: postgres-data
-    persistentVolumeClaim:
-      claimName: django-postgres-pvc
     spec:
-      containers:  # Corrected key name
+      volumes:
+        - name: postgres-data
+          persistentVolumeClaim:
+            claimName: django-postgres-pvc
+      containers:
         - name: postgres
-          image: postgres
+          image: postgres:latest
           ports:
             - containerPort: 5432
               name: postgres
           volumeMounts:
             - name: postgres-data
-              mountPath: var/lib/postgresql/data
-
+              mountPath: /var/lib/postgresql/data
           env:
             - name: POSTGRES_DB
               value: django_db
@@ -57,4 +56,4 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: db-password
-                  key: password  # Corrected key name
+                  key: password
